@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup Chat Sapa</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap">
+<style>
+/* Layout: pratinjau gambar di kiri (menempel saat scroll di desktop), kontrol di kanan; satu kolom di ponsel. */
+:root {
+  --bg: #f3f4f8;
+  --surface: #ffffff;
+  --ink: #12151c;
+  --muted: #5d6573;
+  --line: #dde0e9;
+  --accent: #4f5bd5;
+  --on-accent: #ffffff;
+  --stage: #e4e7ef;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Bricolage Grotesque", "Figtree", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1218;
+    --surface: #171b23;
+    --ink: #eceff5;
+    --muted: #9aa3b2;
+    --line: #2a303c;
+    --accent: #8a94f5;
+    --on-accent: #10131a;
+    --stage: #1b2029;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1218;
+  --surface: #171b23;
+  --ink: #eceff5;
+  --muted: #9aa3b2;
+  --line: #2a303c;
+  --accent: #8a94f5;
+  --on-accent: #10131a;
+  --stage: #1b2029;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  padding-block: 24px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1000px; margin-inline: auto; display: grid; gap: 24px; }
+header h1 {
+  font-family: var(--font-display);
+  font-size: clamp(26px, 5vw, 36px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 0 0 8px;
+  text-wrap: balance;
+}
+header p { margin: 0; color: var(--muted); max-width: 56ch; }
+
+.app { display: grid; gap: 24px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 860px) {
+  .app { grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 40px; }
+  .stage { position: sticky; top: 24px; }
+}
+.stage {
+  width: min(100%, 340px);
+  margin-inline: auto;
+  background: var(--stage);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 10px;
+}
+.stage canvas { display: block; width: 100%; height: auto; border-radius: 12px; }
+
+.panel { display: grid; gap: 22px; min-width: 0; }
+.field { display: grid; gap: 8px; min-width: 0; }
+.field > .lbl, .field > label.lbl {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.row { display: flex; gap: 20px; flex-wrap: wrap; }
+.row > .field { flex: 1 1 200px; }
+
+textarea, input[type="text"] {
+  width: 100%;
+  font: inherit;
+  font-size: 16px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+textarea { min-height: 112px; resize: vertical; }
+textarea:focus-visible, input[type="text"]:focus-visible, input[type="range"]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.hint { font-size: 13px; color: var(--muted); min-height: 1.4em; }
+
+.seg {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 3px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  width: fit-content;
+  max-width: 100%;
+}
+.seg label { position: relative; }
+.seg input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.seg span {
+  display: block;
+  padding: 8px 16px;
+  border-radius: 9px;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--muted);
+}
+.seg input:checked + span { background: var(--accent); color: var(--on-accent); }
+.seg input:focus-visible + span { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.sw { display: flex; gap: 12px; flex-wrap: wrap; }
+.sw label { position: relative; width: 36px; height: 36px; }
+.sw input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.sw span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+}
+.sw input:checked + span { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--ink); }
+.sw input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 5px; }
+
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+.actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.btn {
+  font: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  border: 0;
+  border-radius: 12px;
+  padding: 12px 22px;
+  cursor: pointer;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.btn.ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  padding: 8px 14px;
+  font-size: 14px;
+}
+.btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.btn:active { transform: translateY(1px); }
+.status { font-size: 14px; color: var(--muted); min-height: 1.5em; }
+.note { font-size: 13px; color: var(--muted); margin: 0; max-width: 60ch; }
+@media (prefers-reduced-motion: reduce) { .btn:active { transform: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Mockup Chat Sapa</h1>
+    <p>Buat gambar percakapan untuk presentasi, desain, atau cerita fiksi. Tampilan dan nama aplikasinya orisinal, bukan aplikasi sungguhan.</p>
+  </header>
+
+  <div class="app">
+    <div class="stage">
+      <canvas id="cv" role="img" aria-label="Pratinjau gambar chat"></canvas>
+    </div>
+
+    <form class="panel" id="controls" onsubmit="return false">
+      <div class="field">
+        <label class="lbl" for="msg">Isi pesan</label>
+        <textarea id="msg" maxlength="400">Oke, aku udah di depan ya. Kamu turun aja, jangan lupa bawa jaket 😄</textarea>
+        <div class="hint" id="hint"></div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label class="lbl" for="time">Jam</label>
+          <input type="text" id="time" maxlength="12" value="16.31" autocomplete="off">
+        </div>
+        <div class="field">
+          <span class="lbl" id="l-side">Pengirim</span>
+          <div class="seg" role="radiogroup" aria-labelledby="l-side">
+            <label><input type="radio" name="side" value="in" checked><span>Masuk</span></label>
+            <label><input type="radio" name="side" value="out"><span>Keluar</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <span class="lbl" id="l-theme">Tema gambar</span>
+          <div class="seg" role="radiogroup" aria-labelledby="l-theme">
+            <label><input type="radio" name="theme" value="dark" checked><span>Gelap</span></label>
+            <label><input type="radio" name="theme" value="light"><span>Terang</span></label>
+          </div>
+        </div>
+        <div class="field">
+          <span class="lbl" id="l-acc">Warna</span>
+          <div class="sw" role="radiogroup" aria-labelledby="l-acc">
+            <label><input type="radio" name="accent" value="#7c6cf0" checked aria-label="Ungu"><span style="--c:#7c6cf0"></span></label>
+            <label><input type="radio" name="accent" value="#4a8cf0" aria-label="Biru"><span style="--c:#4a8cf0"></span></label>
+            <label><input type="radio" name="accent" value="#2fb5a0" aria-label="Hijau toska"><span style="--c:#2fb5a0"></span></label>
+            <label><input type="radio" name="accent" value="#e8a838" aria-label="Kuning"><span style="--c:#e8a838"></span></label>
+            <label><input type="radio" name="accent" value="#f0735a" aria-label="Koral"><span style="--c:#f0735a"></span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="lbl" for="blur">Blur latar</label>
+        <input type="range" id="blur" min="4" max="24" value="10">
+        <div class="actions">
+          <button type="button" class="btn ghost" id="shuffle">Acak latar</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="lbl" id="l-fmt">Format file</span>
+        <div class="seg" role="radiogroup" aria-labelledby="l-fmt">
+          <label><input type="radio" name="fmt" value="png" checked><span>PNG</span></label>
+          <label><input type="radio" name="fmt" value="jpg"><span>JPG</span></label>
+          <label><input type="radio" name="fmt" value="jpeg"><span>JPEG</span></label>
+          <label><input type="radio" name="fmt" value="acak"><span>Acak</span></label>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn" id="dl">Unduh gambar</button>
+        <span class="status" id="status" role="status" aria-live="polite"></span>
+      </div>
+      <p class="note">Nama file dibuat acak. Setiap gambar membawa label "Mockup · Sapa" di bagian bawah supaya jelas bahwa ini tampilan rancangan, bukan tangkapan layar asli.</p>
+    </form>
+  </div>
+</div>
+
+<script>
+(function () {
+  var W = 540, H = 960, S = 2;
+  var FF = 'Figtree, system-ui, -apple-system, "Segoe UI", sans-serif';
+  var EMO = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+
+  var cv = document.getElementById('cv');
+  cv.width = W * S; cv.height = H * S;
+  var ctx = cv.getContext('2d');
+  var off = document.createElement('canvas');
+  off.width = W * S; off.height = H * S;
+  var octx = off.getContext('2d');
+
+  var el = {
+    msg: document.getElementById('msg'),
+    time: document.getElementById('time'),
+    blur: document.getElementById('blur'),
+    hint: document.getElementById('hint'),
+    status: document.getElementById('status')
+  };
+
+  var PAL = {
+    dark: { bg: '#0c0f12', header: '#141a1e', bubble: '#1f262b', bar: 'rgba(255,255,255,0.26)', outMix: 0.5,
+      overlay: 'rgba(0,0,0,0.45)', menu: '#262d33', line: 'rgba(255,255,255,0.08)', text: '#eef2f4', sub: '#98a3ab',
+      react: '#262d33', danger: '#ff6f7d', plus: 'rgba(150,160,170,0.32)', outDark: 0.4 },
+    light: { bg: '#e9ecef', header: '#f6f7f8', bubble: '#ffffff', bar: 'rgba(0,0,0,0.16)', outMix: 0.6,
+      overlay: 'rgba(14,18,22,0.28)', menu: '#ffffff', line: 'rgba(0,0,0,0.08)', text: '#13181c', sub: '#6a757d',
+      react: '#ffffff', danger: '#e0344b', plus: 'rgba(110,120,130,0.22)', outDark: 0.22 }
+  };
+
+  var ICONS = {
+    reply: ['M9 17 4 12l5-5', 'M20 18v-2a4 4 0 0 0-4-4H4'],
+    fwd: ['m15 17 5-5-5-5', 'M4 18v-2a4 4 0 0 1 4-4h12'],
+    copy: ['M11 9h9a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2z', 'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'],
+    bookmark: ['m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z'],
+    pin: ['M12 17v5', 'M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z'],
+    flag: ['M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z', 'M4 22v-7'],
+    trash: ['M3 6h18', 'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6', 'M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2', 'M10 11v6', 'M14 11v6']
+  };
+  var ICON_PATHS = {};
+  Object.keys(ICONS).forEach(function (k) { ICON_PATHS[k] = ICONS[k].map(function (d) { return new Path2D(d); }); });
+
+  var ITEMS = [
+    ['Balas', 'reply'], ['Teruskan', 'fwd'], ['Salin', 'copy'], ['Simpan', 'bookmark'],
+    ['Sematkan', 'pin'], ['Laporkan', 'flag'], ['Hapus', 'trash', true]
+  ];
+  var REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🙏', '🎉'];
+
+  var seed = 20261027;
+
+  function mulberry(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function hex2rgb(h) { var n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
+  function mix(a, b, t) {
+    var A = hex2rgb(a), B = hex2rgb(b);
+    return 'rgb(' + A.map(function (v, i) { return Math.round(v + (B[i] - v) * t); }).join(',') + ')';
+  }
+  function rr(c, x, y, w, h, r) {
+    var q = Array.isArray(r) ? r : [r, r, r, r];
+    c.beginPath();
+    c.moveTo(x + q[0], y);
+    c.lineTo(x + w - q[1], y); c.arcTo(x + w, y, x + w, y + q[1], q[1]);
+    c.lineTo(x + w, y + h - q[2]); c.arcTo(x + w, y + h, x + w - q[2], y + h, q[2]);
+    c.lineTo(x + q[3], y + h); c.arcTo(x, y + h, x, y + h - q[3], q[3]);
+    c.lineTo(x, y + q[0]); c.arcTo(x, y, x + q[0], y, q[0]);
+    c.closePath();
+  }
+  function val(n) { return document.querySelector('input[name="' + n + '"]:checked').value; }
+
+  function wrap(c, text, maxW) {
+    var out = [];
+    text.split('\n').forEach(function (para) {
+      if (para === '') { out.push(''); return; }
+      var line = '';
+      para.split(' ').forEach(function (w) {
+        var test = line ? line + ' ' + w : w;
+        if (c.measureText(test).width <= maxW) { line = test; return; }
+        if (line) { out.push(line); line = ''; }
+        if (c.measureText(w).width <= maxW) { line = w; return; }
+        var chunk = '';
+        Array.from(w).forEach(function (ch) {
+          if (c.measureText(chunk + ch).width > maxW) { out.push(chunk); chunk = ch; } else { chunk += ch; }
+        });
+        line = chunk;
+      });
+      out.push(line);
+    });
+    return out;
+  }
+
+  function drawBackdrop(c, P, accent, sd) {
+    var rnd = mulberry(sd);
+    c.fillStyle = P.bg; c.fillRect(0, 0, W, H);
+    c.fillStyle = P.header; c.fillRect(0, 0, W, 104);
+    c.fillStyle = mix(accent, P.bg, 0.3); c.beginPath(); c.arc(60, 64, 20, 0, Math.PI * 2); c.fill();
+    c.fillStyle = P.bar; rr(c, 94, 50, 130, 10, 5); c.fill(); rr(c, 94, 69, 74, 8, 4); c.fill();
+    var y = 122;
+    while (y < H - 96) {
+      var out = rnd() < 0.45, lines = 1 + Math.floor(rnd() * 3), w = 120 + rnd() * 190, h = 18 + lines * 20;
+      var x = out ? W - 16 - w : 16;
+      c.fillStyle = out ? mix(accent, P.bg, P.outMix) : P.bubble;
+      rr(c, x, y, w, h, 16); c.fill();
+      for (var i = 0; i < lines; i++) {
+        var bw = (i === lines - 1 ? 0.45 + rnd() * 0.4 : 0.85 + rnd() * 0.1) * (w - 28);
+        c.fillStyle = P.bar; rr(c, x + 14, y + 14 + i * 20, bw, 8, 4); c.fill();
+      }
+      y += h + 10 + rnd() * 10;
+    }
+    c.fillStyle = P.header; c.fillRect(0, H - 86, W, 86);
+    c.fillStyle = P.bubble; rr(c, 16, H - 72, W - 32, 42, 21); c.fill();
+  }
+
+  function blurInto(blur) {
+    var cw = cv.width, ch = cv.height, pad = blur * S * 1.6;
+    if (typeof ctx.filter === 'string') {
+      ctx.filter = 'blur(' + (blur * S) + 'px)';
+      ctx.drawImage(off, -pad, -pad, cw + pad * 2, ch + pad * 2);
+      ctx.filter = 'none';
+    } else {
+      var k = Math.max(2, blur * 0.9);
+      var t = document.createElement('canvas');
+      t.width = Math.ceil(cw / k); t.height = Math.ceil(ch / k);
+      var tc = t.getContext('2d');
+      tc.imageSmoothingEnabled = true; tc.imageSmoothingQuality = 'high';
+      tc.drawImage(off, 0, 0, t.width, t.height);
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(t, -pad, -pad, cw + pad * 2, ch + pad * 2);
+    }
+  }
+
+  function drawIcon(c, name, x, y, size, color) {
+    c.save();
+    c.translate(x, y); c.scale(size / 24, size / 24);
+    c.strokeStyle = color; c.lineWidth = 1.8; c.lineCap = 'round'; c.lineJoin = 'round';
+    ICON_PATHS[name].forEach(function (p) { c.stroke(p); });
+    c.restore();
+  }
+
+  function draw() {
+    var raw = el.msg.value.replace(/\r/g, '');
+    var time = el.time.value.trim();
+    var out = val('side') === 'out';
+    var theme = val('theme');
+    var accent = val('accent');
+    var blur = +el.blur.value;
+    var P = PAL[theme];
+
+    octx.setTransform(S, 0, 0, S, 0, 0);
+    drawBackdrop(octx, P, accent, seed);
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = P.bg; ctx.fillRect(0, 0, cv.width, cv.height);
+    blurInto(blur);
+    ctx.fillStyle = P.overlay; ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.setTransform(S, 0, 0, S, 0, 0);
+
+    // Teks bubble
+    var maxTextW = 316, lh = 24, MAXLINES = 12;
+    ctx.font = '400 17px ' + FF + ',' + EMO;
+    var lines = wrap(ctx, raw.length ? raw : ' ', maxTextW);
+    var truncated = false;
+    if (lines.length > MAXLINES) {
+      lines = lines.slice(0, MAXLINES); truncated = true;
+      var last = lines[MAXLINES - 1];
+      while (last.length && ctx.measureText(last + '…').width > maxTextW) last = last.slice(0, -1);
+      lines[MAXLINES - 1] = last + '…';
+    }
+    el.hint.textContent = raw.length + '/400 karakter' + (truncated ? ' · teks dipotong di baris ke-12' : '');
+
+    var maxLineW = 0;
+    lines.forEach(function (l) { maxLineW = Math.max(maxLineW, ctx.measureText(l).width); });
+    ctx.font = '500 12px ' + FF;
+    var timeW = time ? ctx.measureText(time).width : 0;
+    var lastW = (function () { ctx.font = '400 17px ' + FF + ',' + EMO; return ctx.measureText(lines[lines.length - 1]).width; })();
+    var contentW = Math.max(maxLineW, 60), inline = true;
+    if (time) {
+      if (lastW + 12 + timeW <= maxTextW) { contentW = Math.max(contentW, lastW + 12 + timeW); }
+      else { inline = false; contentW = Math.max(contentW, timeW); }
+    }
+    var bw = Math.ceil(contentW) + 26;
+    var bh = 12 + lines.length * lh + (time && !inline ? 18 : 6) + 4;
+
+    // Susunan vertikal
+    var RB_W = 432, RB_H = 52, MW = 324, IH = 52, GAP = 12;
+    var total = RB_H + GAP + bh + GAP + IH * ITEMS.length;
+    var top = Math.max(34, Math.round((H - total) / 2) - 8);
+
+    var rbX = out ? W - 24 - RB_W : 24;
+    var bx = out ? W - 24 - bw : 24;
+    var mx = out ? W - 24 - MW : 24;
+
+    // Baris reaksi
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.3)'; ctx.shadowBlur = 24; ctx.shadowOffsetY = 6;
+    ctx.fillStyle = P.react; rr(ctx, rbX, top, RB_W, RB_H, 26); ctx.fill();
+    ctx.restore();
+    ctx.font = '26px ' + EMO; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    REACTIONS.forEach(function (e, i) { ctx.fillStyle = P.text; ctx.fillText(e, rbX + 32 + i * 52, top + RB_H / 2 + 1); });
+    var pcx = rbX + RB_W - 30, pcy = top + RB_H / 2;
+    ctx.fillStyle = P.plus; ctx.beginPath(); ctx.arc(pcx, pcy, 17, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = P.text; ctx.lineWidth = 2; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(pcx - 7, pcy); ctx.lineTo(pcx + 7, pcy); ctx.moveTo(pcx, pcy - 7); ctx.lineTo(pcx, pcy + 7); ctx.stroke();
+
+    // Bubble
+    var by = top + RB_H + GAP;
+    var outFill = mix(accent, '#000000', P.outDark);
+    ctx.fillStyle = out ? outFill : P.bubble;
+    rr(ctx, bx, by, bw, bh, out ? [18, 18, 6, 18] : [18, 18, 18, 6]); ctx.fill();
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    ctx.font = '400 17px ' + FF + ',' + EMO;
+    ctx.fillStyle = out ? '#ffffff' : P.text;
+    lines.forEach(function (l, i) { ctx.fillText(l, bx + 13, by + 12 + 17 + i * lh - 2); });
+    if (time) {
+      ctx.font = '500 12px ' + FF; ctx.textAlign = 'right';
+      ctx.fillStyle = out ? 'rgba(255,255,255,0.72)' : P.sub;
+      ctx.fillText(time, bx + bw - 12, by + bh - 9);
+    }
+
+    // Menu
+    var my = by + bh + GAP, mh = IH * ITEMS.length;
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.35)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 8;
+    ctx.fillStyle = P.menu; rr(ctx, mx, my, MW, mh, 18); ctx.fill();
+    ctx.restore();
+    ctx.save();
+    rr(ctx, mx, my, MW, mh, 18); ctx.clip();
+    ITEMS.forEach(function (it, i) {
+      var iy = my + i * IH, danger = !!it[2];
+      var col = danger ? P.danger : P.text;
+      if (i > 0) { ctx.fillStyle = P.line; ctx.fillRect(mx, iy, MW, 1); }
+      ctx.font = '500 17px ' + FF; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = col; ctx.fillText(it[0], mx + 20, iy + IH / 2 + 1);
+      drawIcon(ctx, it[1], mx + MW - 20 - 22, iy + IH / 2 - 11, 22, col);
+    });
+    ctx.restore();
+
+    // Label mockup
+    ctx.font = '600 11px ' + FF; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = P.sub; ctx.globalAlpha = 0.8;
+    ctx.fillText('MOCKUP · SAPA', W / 2, H - 18);
+    ctx.globalAlpha = 1;
+
+    cv.setAttribute('aria-label', 'Pratinjau chat: ' + (raw.slice(0, 80) || 'pesan kosong'));
+  }
+
+  var pending = false;
+  function schedule() {
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(function () { pending = false; draw(); });
+  }
+
+  document.getElementById('controls').addEventListener('input', schedule);
+  document.getElementById('controls').addEventListener('change', schedule);
+  document.getElementById('shuffle').addEventListener('click', function () {
+    seed = Math.floor(Math.random() * 1e9); schedule();
+  });
+
+  // Jam awal mengikuti jam perangkat
+  try {
+    var d = new Date();
+    el.time.value = String(d.getHours()).padStart(2, '0') + '.' + String(d.getMinutes()).padStart(2, '0');
+  } catch (e) {}
+
+  draw();
+  try {
+    Promise.all(['400 17px Figtree', '500 17px Figtree', '500 12px Figtree', '600 11px Figtree'].map(function (f) { return document.fonts.load(f); }))
+      .then(schedule, function () {});
+  } catch (e) {}
+
+  // Unduh
+  function say(t) { el.status.textContent = t; }
+  function randId() { return Math.random().toString(36).slice(2, 8); }
+  var dlCap;
+  function getDl() {
+    if (dlCap !== undefined) return Promise.resolve(dlCap);
+    if (!(window.claude && window.claude.use)) { dlCap = null; return Promise.resolve(null); }
+    return window.claude.use('downloads').then(function (d) { dlCap = d || null; return dlCap; }, function () { dlCap = null; return null; });
+  }
+
+  document.getElementById('dl').addEventListener('click', function () {
+    draw();
+    var fmt = val('fmt');
+    if (fmt === 'acak') fmt = ['png', 'jpg', 'jpeg'][Math.floor(Math.random() * 3)];
+    var mime = fmt === 'png' ? 'image/png' : 'image/jpeg';
+    var name = 'sapa-' + randId() + '.' + fmt;
+    cv.toBlob(function (blob) {
+      if (!blob) { say('Gambar belum bisa dibuat. Coba lagi.'); return; }
+      getDl().then(function (dl) {
+        if (dl) {
+          dl.save({ filename: name, data: blob }).then(
+            function () { say('Tersimpan sebagai ' + name); },
+            function (e) {
+              if (e && e.code === 'declined') say('Unduhan dibatalkan.');
+              else say('Unduhan gagal (' + ((e && e.code) || 'error') + ').');
+            }
+          );
+        } else {
+          var a = document.createElement('a');
+          a.href = URL.createObjectURL(blob); a.download = name;
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+          say('Mengunduh ' + name);
+        }
+      });
+    }, mime, 0.95);
+  });
+})();
+</script>
+</body>
+</html>
